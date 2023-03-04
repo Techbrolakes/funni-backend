@@ -1,5 +1,11 @@
 import { Document } from 'mongoose';
 
+export enum IGenderType {
+    MALE = 'male',
+    FEMALE = 'female',
+    OTHERS = 'others',
+}
+
 export interface IUser {
     first_name?: string;
     last_name?: string;
