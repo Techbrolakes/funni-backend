@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/conn';
 import cors from 'cors';
 import { IUserDocument } from './interfaces/user.interface';
+import userRoutes from './routes/user.route';
 
 export interface ExpressRequest extends Request {
     user?: IUserDocument;
@@ -13,6 +14,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 dotenv.config();
+
+app.use('/api/v1/user', userRoutes);
+
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
 
 app.all('*', (req, res) => {
     return res.status(404).json({ message: 'Route not found' });
@@ -27,5 +34,5 @@ connectDB()
         }
     })
     .catch((e) => {
-        console.log('Invalid database connection...! ', +e);
+        console.log('Invalid database connection...! ', e);
     });
