@@ -1,9 +1,9 @@
 import express from 'express';
 import * as UserControllers from '../controllers/user.controller';
-import auth from '../middlewares/auth.middleware';
+import * as UserValidations from '../validations/user.validation';
 
 const router = express.Router();
 
-router.post('/register', UserControllers.Register);
+router.post('/register', UserValidations.RegisterUser, UserControllers.Register);
 
 export default router;

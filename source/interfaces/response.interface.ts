@@ -1,5 +1,11 @@
-import { Response } from 'express';
+import { NextFunction, Response } from 'express';
+import { ExpressRequest } from '../server';
 
+export interface IReqResNext {
+    req: ExpressRequest;
+    res: Response;
+    next: NextFunction;
+}
 export interface IResponse {
     res: Response;
     code?: number;
