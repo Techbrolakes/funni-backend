@@ -1,5 +1,10 @@
 import { Document } from 'mongoose';
 
+export interface IVerifyMail {
+    email: string;
+    otp: number;
+}
+
 export interface IRegister {
     first_name: string;
     last_name: string;
@@ -29,6 +34,9 @@ export interface IUser {
     phone?: string;
     address?: string;
     gender?: IGenderType;
+    verified_email?: boolean;
+    verified_email_at?: Date;
+    is_disabled?: boolean;
 }
 
 export interface IUserDocument extends IUser, Document {}

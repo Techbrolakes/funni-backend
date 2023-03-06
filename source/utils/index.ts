@@ -1,6 +1,8 @@
 import { Types } from 'mongoose';
-import { IOtp } from '../interfaces/otp.interface';
 import otpService from '../services/otp.service';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
 class UtilsFunc {
     // Generate OTP
@@ -15,6 +17,13 @@ class UtilsFunc {
         } else {
             return otpService.updateOtp({ otp, expires_in, user_id });
         }
+    };
+
+    // Generate Jwt token
+    public static generateToken = (data: any) => {
+        return jwt.sign(data, process.env.JWT_SECRET || 'jwt', {
+            expiresIn: '30d',
+        });
     };
 }
 

@@ -1,6 +1,7 @@
 import { User } from '../models';
 import bcrypt from 'bcrypt';
 import { IGetByEmail, IRegister, IUserDocument } from '../interfaces/user.interface';
+import { Types } from 'mongoose';
 
 class UserService {
     // Create a new user
@@ -20,6 +21,11 @@ class UserService {
     public getByEmail = async ({ email, leanVersion = true }: IGetByEmail): Promise<IUserDocument> => {
         return User.findOne({ email }).lean(leanVersion);
     };
+
+    // Find a user by id and update
+    public async atomicUpdate(user_id: Types.ObjectId, record: any, session: any = null) {
+        return User.findOneAndUpdate({ _id: user_id }, { ...record }, { new: true, session });
+    }
 }
 
 export default new UserService();

@@ -10,6 +10,9 @@ export const UserSchema: Schema = new Schema(
         phone: { type: String },
         address: { type: String },
         gender: { type: String, enum: Object.values(IGenderType) },
+        verified_email: { type: Boolean, default: false },
+        verified_email_at: Date,
+        is_disabled: { type: Boolean, default: false },
     },
     { timestamps: true },
 );

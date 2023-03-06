@@ -5,5 +5,6 @@ import * as UserValidations from '../validations/user.validation';
 const router = express.Router();
 
 router.post('/register', UserValidations.RegisterUser, UserControllers.Register);
+router.post('/verify-email', UserValidations.VerifyEmail, UserControllers.verifyEmail);
 
 export default router;
