@@ -19,11 +19,27 @@ class UtilsFunc {
         }
     };
 
-    // Generate Jwt token
+    /** Generate and sign a user Token */
     public static generateToken = (data: any) => {
         return jwt.sign(data, process.env.JWT_SECRET || 'jwt', {
             expiresIn: '30d',
         });
+    };
+
+    /** Generate and verify a user Token */
+    public static verifyToken = async (token: string, secret = process.env.JWT_SECRET || 'jwt') => {
+        try {
+            const decoded = await jwt.verify(token, secret);
+            return decoded;
+        } catch (err: any) {
+            if (err instanceof jwt.JsonWebTokenError) {
+                throw new Error('Invalid token');
+            } else if (err instanceof jwt.TokenExpiredError) {
+                throw new Error('Token expired');
+            } else {
+                throw new Error('Failed to verify token');
+            }
+        }
     };
 }
 

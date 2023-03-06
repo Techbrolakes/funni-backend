@@ -12,6 +12,44 @@ import bcrypt from 'bcrypt';
 /******
  *
  *
+ * Reset Password
+ */
+
+export const resetPassword = async (req: ExpressRequest, res: Response): Promise<Response | void> => {
+    const { token, new_password, confirm_password } = req.body;
+
+    try {
+        const verify_token: any = await UtilsFunc.verifyToken(token);
+
+        const user = await userService.getByEmail({ email: verify_token.email });
+        if (!user) {
+            return ResponseHandler.sendErrorResponse({ res, code: 404, error: 'Email does not exist' });
+        }
+        if (!user.verified_email) {
+            return ResponseHandler.sendErrorResponse({ res, code: 409, error: 'Email is not verified already' });
+        }
+        if (user.is_disabled) {
+            return ResponseHandler.sendErrorResponse({ res, code: 409, error: 'Your account has been disabled' });
+        }
+
+        if (new_password !== confirm_password) {
+            return ResponseHandler.sendErrorResponse({ res, code: 400, error: `Passwords mismatch` });
+        }
+        const hash = bcrypt.hashSync(new_password, 10);
+        await userService.atomicUpdate(user._id, { $set: { password: hash } });
+        return ResponseHandler.sendSuccessResponse({
+            res,
+            code: 200,
+            message: 'Your password has been successfully updated',
+        });
+    } catch (error) {
+        return ResponseHandler.sendErrorResponse({ res, code: 500, error: `${error}` });
+    }
+};
+
+/******
+ *
+ *
  * Verify OTP
  */
 export const verifyOTP = async (req: ExpressRequest, res: Response): Promise<Response | void> => {

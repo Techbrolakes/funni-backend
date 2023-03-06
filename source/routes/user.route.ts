@@ -10,5 +10,6 @@ router.post('/resend', UserValidations.resendVerification, UserControllers.resen
 router.post('/login', UserValidations.loginUser, UserControllers.loginUser);
 router.post('/recover', UserValidations.recoverPassword, UserControllers.recoverPassword);
 router.post('/verify-otp', UserValidations.verifyOTP, UserControllers.verifyOTP);
+router.post('/reset-password', UserValidations.resetPassword, UserControllers.resetPassword);
 
 export default router;
