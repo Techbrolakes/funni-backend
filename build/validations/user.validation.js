@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterUser = void 0;
 const joi_1 = __importDefault(require("joi"));
 const response_handler_1 = __importDefault(require("../utils/response-handler"));
-const RegisterUser = async ({ req, res, next }) => {
+const RegisterUser = async (req, res, next) => {
     const schema = joi_1.default.object()
         .keys({
         first_name: joi_1.default.string().required(),

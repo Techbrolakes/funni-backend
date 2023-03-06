@@ -6,6 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Register = void 0;
 const response_handler_1 = __importDefault(require("../utils/response-handler"));
 const user_service_1 = __importDefault(require("../services/user.service"));
+const mongoose_1 = require("mongoose");
+const utils_1 = __importDefault(require("../utils"));
+const mail_service_1 = require("../services/mail.service");
 const Register = async (req, res) => {
     const { first_name, last_name, email, password, confirm_password, phone_number } = req.body;
     try {
@@ -23,6 +26,14 @@ const Register = async (req, res) => {
             password,
             confirm_password,
             phone_number,
+        });
+        const user_id = new mongoose_1.Types.ObjectId(String(user._id));
+        const otp = await utils_1.default.generateOtp({ user_id });
+        await (0, mail_service_1.sendWelcomeEmail)({
+            email: user.email,
+            name: user.first_name,
+            otp: otp?.otp,
+            subject: 'Welcome to FurniZen',
         });
         return response_handler_1.default.sendSuccessResponse({
             message: `A verification mail has been sent to ${user.email}`,

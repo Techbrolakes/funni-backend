@@ -1,21 +1,22 @@
-import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
-import Mailgen from 'mailgen';
-import { ISendMail } from '../interfaces/email.interface';
-dotenv.config();
-
-// Configure mailgen by setting a theme and your product info
-const mailGenerator = new Mailgen({
-    theme: 'cerberus',
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sendWelcomeEmail = void 0;
+const nodemailer_1 = __importDefault(require("nodemailer"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const mailgen_1 = __importDefault(require("mailgen"));
+dotenv_1.default.config();
+const mailGenerator = new mailgen_1.default({
+    theme: 'default',
     product: {
         name: 'FurniZen',
         link: 'https://www.linkedin.com/in/lekandar/',
     },
 });
-
-// Nodemail Smtp Transporter Config
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST, // use SSL
+const transporter = nodemailer_1.default.createTransport({
+    host: process.env.SMTP_HOST,
     port: 465,
     secure: true,
     auth: {
@@ -26,45 +27,42 @@ const transporter = nodemailer.createTransport({
         rejectUnauthorized: false,
     },
 });
-
-// test transporter connection
 transporter.verify((error) => {
     if (error) {
         console.log(error);
-    } else {
+    }
+    else {
         console.log('Server is ready to take our messages');
     }
 });
-
-// Functions to send different types of emails
-
-export const sendWelcomeEmail = async ({ subject = '', email, name, otp }: ISendMail) => {
+const sendWelcomeEmail = async ({ subject = '', email, name, otp }) => {
     const welcomeTemplate = mailGenerator.generate({
         body: {
             name,
             intro: "Welcome to FurniZen! We're very excited to have you on board.",
             action: {
-                instructions: `To get started with your account, Please enter this otp, It will expiry in 15 minutes`,
+                instructions: `To get started with your account, please enter this otp ${otp}, it will expiry in 15 Minutes`,
                 button: {
                     color: '#336B6B',
-                    text: `${otp}`,
-                    link: '#',
+                    text: 'Enter the otp',
+                    link: 'https://www.linkedin.com/in/lekandar/',
                 },
             },
             outro: "Need help, or have questions? Just reply to this email, we'd love to help.",
         },
     });
     const mailOptions = {
-        from: process.env.SMTP_USER as string,
+        from: process.env.SMTP_USER,
         to: email,
         subject: subject,
         html: welcomeTemplate,
     };
-
     try {
         await transporter.sendMail(mailOptions);
         return;
-    } catch (error) {
+    }
+    catch (error) {
         console.log(error);
     }
 };
+exports.sendWelcomeEmail = sendWelcomeEmail;
