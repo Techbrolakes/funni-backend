@@ -3,6 +3,8 @@ import { ExpressRequest } from '../server';
 import { IRegister } from '../interfaces/user.interface';
 import ResponseHandler from '../utils/response-handler';
 import userService from '../services/user.service';
+import { Types } from 'mongoose';
+import UtilsFunc from '../utils';
 
 export const Register = async (req: ExpressRequest, res: Response): Promise<Response> => {
     const { first_name, last_name, email, password, confirm_password, phone_number }: IRegister = req.body;
@@ -23,6 +25,9 @@ export const Register = async (req: ExpressRequest, res: Response): Promise<Resp
             confirm_password,
             phone_number,
         });
+        const user_id = new Types.ObjectId(String(user._id));
+        // SAVE OTP
+        const otp = await UtilsFunc.generateOtp({ user_id });
 
         return ResponseHandler.sendSuccessResponse({
             message: `A verification mail has been sent to ${user.email}`,
