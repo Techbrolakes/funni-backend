@@ -14,7 +14,7 @@ class OtpService {
     };
 
     public updateOtp = async ({ user_id, otp, expires_in }: IOtp): Promise<IOtpDocument | null> => {
-        return await Otp.findByIdAndUpdate(
+        return await Otp.findOneAndUpdate(
             { user_id: user_id },
             { $set: { otp: otp, expires_in: expires_in } },
             { new: true },

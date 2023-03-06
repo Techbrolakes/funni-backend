@@ -6,5 +6,6 @@ const router = express.Router();
 
 router.post('/register', UserValidations.RegisterUser, UserControllers.Register);
 router.post('/verify-email', UserValidations.VerifyEmail, UserControllers.verifyEmail);
+router.post('/resend', UserValidations.resendVerification, UserControllers.resendVerification);
 
 export default router;

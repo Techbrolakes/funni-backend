@@ -97,3 +97,36 @@ export const verifyEmail = async (req: ExpressRequest, res: Response) => {
         return ResponseHandler.sendErrorResponse({ res, code: 500, error: `${error}` });
     }
 };
+
+/******
+ *
+ *
+ * Resend Verification
+ */
+
+export const resendVerification = async (req: ExpressRequest, res: Response): Promise<Response | void> => {
+    const { email }: { email: string } = req.body;
+
+    try {
+        const user = await userService.getByEmail({ email: email.toLowerCase() });
+        if (!user) return ResponseHandler.sendErrorResponse({ res, code: 404, error: 'Email does not exist' });
+        if (user.verified_email) {
+            return ResponseHandler.sendErrorResponse({ res, code: 409, error: 'Email is verified already' });
+        }
+        const otp = await UtilsFunc.generateOtp({ user_id: user._id });
+        await sendWelcomeEmail({
+            email: user.email,
+            name: user.first_name,
+            otp: otp?.otp,
+            subject: 'Welcome to FurniZen',
+        });
+
+        return ResponseHandler.sendSuccessResponse({
+            message: `A verification mail has been sent to ${user.email}`,
+            code: 201,
+            res,
+        });
+    } catch (error) {
+        return ResponseHandler.sendErrorResponse({ res, code: 500, error: `${error}` });
+    }
+};

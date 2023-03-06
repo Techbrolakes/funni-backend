@@ -44,7 +44,38 @@ export const sendWelcomeEmail = async ({ subject = '', email, name, otp }: ISend
             name,
             intro: "Welcome to FurniZen! We're very excited to have you on board.",
             action: {
-                instructions: `To get started with your account, Please enter this otp, It will expiry in 15 minutes`,
+                instructions: `To get started with your account, Please use the code below to verify your email ${email}, It will expiry in 15 minutes`,
+                button: {
+                    color: '#336B6B',
+                    text: `${otp}`,
+                    link: '#',
+                },
+            },
+            outro: "Need help, or have questions? Just reply to this email, we'd love to help.",
+        },
+    });
+    const mailOptions = {
+        from: process.env.SMTP_USER as string,
+        to: email,
+        subject: subject,
+        html: welcomeTemplate,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        return;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const sendVerificationEmail = async ({ subject = '', email, name, otp }: ISendMail) => {
+    const welcomeTemplate = mailGenerator.generate({
+        body: {
+            name,
+            intro: "Welcome to FurniZen! We're very excited to have you on board.",
+            action: {
+                instructions: `To get started with your account, Please use the code below to verify your email ${email}, It will expiry in 15 minutes`,
                 button: {
                     color: '#336B6B',
                     text: `${otp}`,
