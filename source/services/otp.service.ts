@@ -21,7 +21,7 @@ class OtpService {
         );
     };
 
-    public verifyOtp = async ({ otp, user_id }: IOtp): Promise<any> => {
+    public verifyOtp = async ({ otp, user_id }: { otp: number; user_id: Types.ObjectId }): Promise<any> => {
         try {
             const getOtp = await this.getOtpByUser({ user_id });
             if (getOtp?.otp == otp && Number(getOtp?.expires_in) > Date.now()) {

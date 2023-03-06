@@ -12,6 +12,40 @@ import bcrypt from 'bcrypt';
 /******
  *
  *
+ * Verify OTP
+ */
+export const verifyOTP = async (req: ExpressRequest, res: Response): Promise<Response | void> => {
+    const { email, otp }: { email: string; otp: number } = req.body;
+    try {
+        const user = await userService.getByEmail({ email: email.toLowerCase() });
+        if (!user) return ResponseHandler.sendErrorResponse({ res, code: 404, error: 'Email does not exist' });
+        if (user.is_disabled) {
+            return ResponseHandler.sendErrorResponse({ res, code: 409, error: 'Your account has been disabled' });
+        }
+        const verifyOtp = await otpService.verifyOtp({ otp, user_id: user._id });
+        if (!verifyOtp.status) {
+            return ResponseHandler.sendErrorResponse({
+                res,
+                code: 400,
+                error: verifyOtp.message,
+            });
+        }
+        const token = await UtilsFunc.generateToken({
+            _id: user._id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+        });
+        const data = { token };
+        return ResponseHandler.sendSuccessResponse({ res, code: 200, message: 'OTP Verification successful.', data });
+    } catch (error) {
+        return ResponseHandler.sendErrorResponse({ res, code: 500, error: `${error}` });
+    }
+};
+
+/******
+ *
+ *
  * Recover Password
  */
 
