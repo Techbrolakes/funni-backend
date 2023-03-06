@@ -4,8 +4,9 @@ import * as UserValidations from '../validations/user.validation';
 
 const router = express.Router();
 
-router.post('/register', UserValidations.RegisterUser, UserControllers.Register);
+router.post('/register', UserValidations.registerUser, UserControllers.registerUser);
 router.post('/verify-email', UserValidations.VerifyEmail, UserControllers.verifyEmail);
 router.post('/resend', UserValidations.resendVerification, UserControllers.resendVerification);
+router.post('/login', UserValidations.loginUser, UserControllers.loginUser);
 
 export default router;

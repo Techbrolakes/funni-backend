@@ -7,13 +7,14 @@ import { Types } from 'mongoose';
 import UtilsFunc from '../utils';
 import { sendWelcomeEmail } from '../services/mail.service';
 import otpService from '../services/otp.service';
+import bcrypt from 'bcrypt';
 
 /******
  *
  *
  * Register Email
  */
-export const Register = async (req: ExpressRequest, res: Response): Promise<Response> => {
+export const registerUser = async (req: ExpressRequest, res: Response): Promise<Response> => {
     const { first_name, last_name, email, password, confirm_password, phone_number }: IRegister = req.body;
 
     try {
@@ -126,6 +127,52 @@ export const resendVerification = async (req: ExpressRequest, res: Response): Pr
             code: 201,
             res,
         });
+    } catch (error) {
+        return ResponseHandler.sendErrorResponse({ res, code: 500, error: `${error}` });
+    }
+};
+
+/******
+ *
+ *
+ * Login
+ */
+
+export const loginUser = async (req: ExpressRequest, res: Response): Promise<Response | void> => {
+    const { email, password } = req.body;
+    try {
+        const user = await userService.getByEmail({ email: email.toLowerCase() });
+        if (!user) return ResponseHandler.sendErrorResponse({ res, code: 404, error: 'Email does not exist' });
+        if (!user.verified_email) {
+            return res.status(401).json({
+                success: false,
+                code: 401,
+                message: 'Email is not verified yet',
+                data: {
+                    verified_email: false,
+                },
+            });
+        }
+        if (user.is_disabled) {
+            return ResponseHandler.sendErrorResponse({ res, code: 403, error: 'User Account is disabled' });
+        }
+        const result = bcrypt.compareSync(password, user?.password!);
+        if (!result) {
+            return ResponseHandler.sendErrorResponse({
+                res,
+                code: 400,
+                error: 'Password is incorrect',
+            });
+        }
+        const token = await UtilsFunc.generateToken({
+            _id: user._id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+        });
+
+        const data = { token, ...user };
+        return ResponseHandler.sendSuccessResponse({ res, code: 200, message: 'Login successful', data });
     } catch (error) {
         return ResponseHandler.sendErrorResponse({ res, code: 500, error: `${error}` });
     }
