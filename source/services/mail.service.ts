@@ -69,27 +69,27 @@ export const sendWelcomeEmail = async ({ subject = '', email, name, otp }: ISend
     }
 };
 
-export const sendVerificationEmail = async ({ subject = '', email, name, otp }: ISendMail) => {
-    const welcomeTemplate = mailGenerator.generate({
+export const sendPasswordRecoveryEmail = async ({ subject = '', email, name, otp }: ISendMail) => {
+    const passwordRecoveryTemplate = mailGenerator.generate({
         body: {
             name,
-            intro: "Welcome to FurniZen! We're very excited to have you on board.",
+            intro: 'Verification Needed',
             action: {
-                instructions: `To get started with your account, Please use the code below to verify your email ${email}, It will expiry in 15 minutes`,
+                instructions: `To recover your account 🔒 , please use the following code — it will expire in 15 minutes ⏰ :`,
                 button: {
                     color: '#336B6B',
                     text: `${otp}`,
                     link: '#',
                 },
             },
-            outro: "Need help, or have questions? Just reply to this email, we'd love to help.",
+            outro: 'If you did not make this request, please contact us or ignore this message..',
         },
     });
     const mailOptions = {
         from: process.env.SMTP_USER as string,
         to: email,
         subject: subject,
-        html: welcomeTemplate,
+        html: passwordRecoveryTemplate,
     };
 
     try {
