@@ -28,15 +28,21 @@ UtilsFunc.generateToken = (data) => {
         expiresIn: '30d',
     });
 };
-UtilsFunc.verifyToken = (token) => {
-    return new Promise((resolve, reject) => {
-        jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || 'jwt', (err, decoded) => {
-            if (err) {
-                console.log(err.message);
-                reject({ status: false, error: err.message });
-            }
-            resolve({ status: true, decoded });
-        });
-    });
+UtilsFunc.verifyToken = async (token, secret = process.env.JWT_SECRET || 'jwt') => {
+    try {
+        const decoded = await jsonwebtoken_1.default.verify(token, secret);
+        return decoded;
+    }
+    catch (err) {
+        if (err instanceof jsonwebtoken_1.default.JsonWebTokenError) {
+            throw new Error('Invalid token');
+        }
+        else if (err instanceof jsonwebtoken_1.default.TokenExpiredError) {
+            throw new Error('Token expired');
+        }
+        else {
+            throw new Error('Failed to verify token');
+        }
+    }
 };
 exports.default = UtilsFunc;

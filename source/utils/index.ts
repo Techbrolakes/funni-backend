@@ -22,8 +22,15 @@ class UtilsFunc {
     /** Generate and sign a user Token */
     public static generateToken = (data: any) => {
         return jwt.sign(data, process.env.JWT_SECRET || 'jwt', {
-            expiresIn: '30d',
+            expiresIn: '1h',
         });
+    };
+
+    public static throwIfUndefined = <T>(x: T | undefined, name: string = 'Value'): T => {
+        if (x === undefined) {
+            throw new Error(`${name} must not be undefined`);
+        }
+        return x;
     };
 
     /** Generate and verify a user Token */

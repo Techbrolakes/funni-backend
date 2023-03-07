@@ -15,16 +15,12 @@ const resetPassword = async (req, res) => {
     const { token, new_password, confirm_password } = req.body;
     try {
         const verify_token = await utils_1.default.verifyToken(token);
-        if (!verify_token.status) {
-            return response_handler_1.default.sendErrorResponse({ res, code: 401, error: verify_token.error });
-        }
-        const user = await user_service_1.default.getByEmail({ email: verify_token.email.decoded });
-        console.log(user);
+        const user = await user_service_1.default.getByEmail({ email: verify_token.email });
         if (!user) {
             return response_handler_1.default.sendErrorResponse({ res, code: 404, error: 'Email does not exist' });
         }
-        if (user.verified_email) {
-            return response_handler_1.default.sendErrorResponse({ res, code: 409, error: 'Email is verified already' });
+        if (!user.verified_email) {
+            return response_handler_1.default.sendErrorResponse({ res, code: 409, error: 'Email is not verified already' });
         }
         if (user.is_disabled) {
             return response_handler_1.default.sendErrorResponse({ res, code: 409, error: 'Your account has been disabled' });

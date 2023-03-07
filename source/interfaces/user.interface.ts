@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export interface IVerifyMail {
     email: string;
@@ -16,6 +16,10 @@ export interface IRegister {
 
 export interface IGetByEmail {
     email: string;
+    leanVersion?: boolean;
+}
+export interface IGetById {
+    _id: Types.ObjectId;
     leanVersion?: boolean;
 }
 
