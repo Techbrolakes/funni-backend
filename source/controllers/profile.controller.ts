@@ -12,20 +12,22 @@ import { User } from '../models';
  */
 export const getAllUsers = async (req: ExpressRequest, res: Response): Promise<Response | void> => {
     try {
-        const token: any = req.header('x-auth-token') || req.header('Authorization');
-        const verify_token: any = await UtilsFunc.verifyToken(token);
+        const user = UtilsFunc.throwIfUndefined(req.user, 'req.user');
 
-        const getUser = await userService.getById({ _id: verify_token._id });
+        const getUser = await userService.getById({ _id: user._id });
+
         if (!getUser) {
-            return ResponseHandler.sendErrorResponse({ res, code: 404, error: 'User not found' });
+            return ResponseHandler.sendErrorResponse({ res, code: 404, error: 'User does not exist' });
         }
 
-        const profile = await userService.getByQuery(
-            { _id: verify_token._id },
-            'first_name last_name email phone_number gender address',
-        );
+        const profile = await userService.getByQuery({ _id: user._id }, 'first_name last_name email  gender address');
 
-        return ResponseHandler.sendSuccessResponse({ res, code: 200, data: profile });
+        return ResponseHandler.sendSuccessResponse({
+            res,
+            code: 200,
+            message: 'User Successfully fetched',
+            data: profile,
+        });
     } catch (error) {
         return ResponseHandler.sendErrorResponse({ res, code: 500, error: `${error}` });
     }

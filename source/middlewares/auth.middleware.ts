@@ -12,14 +12,14 @@ const auth = (req: ExpressRequest, res: Response, next: NextFunction) => {
     try {
         jwt.verify(token, process.env.JWT_SECRET || 'jwt', (error: any, decoded: any) => {
             if (error) {
-                return ResponseHandler.sendErrorResponse({ res, code: 400, error: 'Invalid token.' });
+                return ResponseHandler.sendErrorResponse({ res, code: 400, error: 'Invalid token Provided.' });
             } else {
                 req.user = decoded;
                 next();
             }
         });
     } catch (error) {
-        return ResponseHandler.sendErrorResponse({ res, code: 400, error: 'Invalid token.' });
+        return ResponseHandler.sendErrorResponse({ res, code: 400, error: 'Invalid token Provided.' });
     }
 };
 
