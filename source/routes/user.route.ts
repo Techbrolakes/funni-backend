@@ -14,5 +14,6 @@ router.post('/recover', UserValidations.recoverPassword, UserControllers.recover
 router.post('/verify-otp', UserValidations.verifyOTP, UserControllers.verifyOTP);
 router.post('/reset-password', UserValidations.resetPassword, UserControllers.resetPassword);
 router.get('/get', auth, UserProfile.getAllUsers);
+router.put('/edit', auth, UserProfile.editProfile);
 
 export default router;
