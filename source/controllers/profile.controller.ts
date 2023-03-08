@@ -4,6 +4,7 @@ import ResponseHandler from '../utils/response-handler';
 import UtilsFunc from '../utils';
 import userService from '../services/user.service';
 import { User } from '../models';
+import bcrypt from 'bcrypt';
 
 /****
  *
@@ -13,6 +14,39 @@ import { User } from '../models';
 
 export const resetPassword = async (req: ExpressRequest, res: Response): Promise<Response | void> => {
     try {
+        const user_id = UtilsFunc.throwIfUndefined(req.user, 'req.user')._id;
+
+        const { current_password, new_password, confirm_password } = req.body;
+
+        const user = await userService.getById({ _id: user_id });
+        if (!user) {
+            return ResponseHandler.sendErrorResponse({ res, code: 404, error: 'User does not exist' });
+        }
+
+        const result = bcrypt.compareSync(current_password, user?.password!);
+        if (!result) {
+            return ResponseHandler.sendErrorResponse({
+                res,
+                code: 404,
+                error: 'Current password is incorrect.',
+            });
+        }
+
+        if (new_password !== confirm_password) {
+            return ResponseHandler.sendErrorResponse({ res, code: 404, error: 'Password does not match' });
+        }
+
+        const password = bcrypt.hashSync(new_password, 10);
+
+        const saved = await userService.atomicUpdate(user_id, { $set: { password: password } });
+
+        if (saved) {
+            return ResponseHandler.sendSuccessResponse({
+                res,
+                code: 200,
+                message: 'User Successfully updated',
+            });
+        }
     } catch (error) {
         return ResponseHandler.sendErrorResponse({ res, code: 500, error: `${error}` });
     }
